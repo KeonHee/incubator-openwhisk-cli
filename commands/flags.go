@@ -57,6 +57,8 @@ type FlagsStruct struct {
 		annotFile  string
 		param      []string
 		paramFile  string
+		clearParam bool
+		clearAnnot bool
 		shared     string // AKA "public" or "publish"
 		skip       int    // skip first N records
 		limit      int    // return max N records
