@@ -379,6 +379,8 @@ func parseAction(cmd *cobra.Command, args []string, update bool) (*whisk.Action,
 	var existingAction *whisk.Action
 	var paramArgs []string
 	var annotArgs []string
+	var clearParam bool
+	var clearAnnotation bool
 	var parameters interface{}
 	var annotations interface{}
 
@@ -402,21 +404,30 @@ func parseAction(cmd *cobra.Command, args []string, update bool) (*whisk.Action,
 
 	paramArgs = Flags.common.param
 	annotArgs = Flags.common.annotation
+	clearParam = Flags.common.clearParam
+	clearAnnotation = Flags.common.clearAnnot
 
-	if len(paramArgs) > 0 {
-		if parameters, err = getJSONFromStrings(paramArgs, true); err != nil {
-			return nil, getJSONFromStringsParamError(paramArgs, true, err)
+	if clearParam {
+		action.Parameters = whisk.KeyValueArr{whisk.KeyValue{"",""}}
+	} else {
+		if len(paramArgs) > 0 {
+			if parameters, err = getJSONFromStrings(paramArgs, true); err != nil {
+				return nil, getJSONFromStringsParamError(paramArgs, true, err)
+			}
+
+			action.Parameters = parameters.(whisk.KeyValueArr)
 		}
-
-		action.Parameters = parameters.(whisk.KeyValueArr)
 	}
 
-	if len(annotArgs) > 0 {
-		if annotations, err = getJSONFromStrings(annotArgs, true); err != nil {
-			return nil, getJSONFromStringsAnnotError(annotArgs, true, err)
+	if clearAnnotation {
+		action.Annotations = whisk.KeyValueArr{whisk.KeyValue{"",""}}
+	} else {
+		if len(paramArgs) > 0 {
+			if annotations, err = getJSONFromStrings(annotArgs, true); err != nil {
+				return nil, getJSONFromStringsAnnotError(annotArgs, true, err)
+			}
+			action.Annotations = annotations.(whisk.KeyValueArr)
 		}
-
-		action.Annotations = annotations.(whisk.KeyValueArr)
 	}
 
 	if len(Flags.action.kind) > 0 && len(Flags.action.docker) > 0 {
